@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tehran Light</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d0d1a;color:#e0e0e0;font-family:Tahoma;display:flex;justify-content:center;padding:20px}
+.container{max-width:900px;width:100%;background:linear-gradient(145deg,#14142a,#1a1a35);padding:30px;border-radius:24px;border:1px solid #2a2a50}
+.header{text-align:center;padding-bottom:20px;border-bottom:2px solid #2a2a50;margin-bottom:25px}
+.header .logo-img{width:80px;height:80px;border-radius:50%;border:3px solid #00d4ff;animation:rgb 2s infinite}
+@keyframes rgb{0%{border-color:#ff0000}33%{border-color:#00ff00}66%{border-color:#0088ff}100%{border-color:#ff0000}}
+.header h1{font-size:2.5rem;color:#f5c842}
+.header .tagline{font-size:1.3rem;color:#f5c842}
+.welcome{background:rgba(255,255,255,0.03);padding:20px;border-radius:12px;border-right:4px solid #f5c842;margin-bottom:20px;text-align:center}
+.welcome h2{color:#f5c842}
+.server-info{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;background:rgba(255,255,255,0.03);padding:15px;border-radius:12px;margin-bottom:20px}
+.info-badge{background:#1e1e3f;padding:8px 18px;border-radius:50px;border:1px solid #333}
+.online-players{text-align:center;padding:15px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid #2a2a55;margin-bottom:20px;font-size:1.2rem}
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:25px}
+.feature-item{background:#161633;padding:15px;border-radius:12px;text-align:center;border:1px solid #2a2a55;cursor:pointer;transition:0.3s}
+.feature-item:hover{background:#1f1f4a;transform:translateY(-3px)}
+.feature-item .icon{font-size:1.8rem;display:block}
+.feature-item.ticket-btn{border-color:#f5c842;background:#1a1a2a}
+.feature-item.ticket-btn:hover{background:#f5c842;color:#0d0d1a}
+.cta-section{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px 0}
+.cta-btn{padding:12px 25px;border-radius:50px;font-weight:700;border:none;cursor:pointer;transition:0.3s;color:#fff;background:#1e1e42;border:1px solid #333}
+.cta-btn:hover{transform:scale(1.05)}
+.cta-btn.rules{background:#1e4a3a}
+.cta-btn.rules:hover{background:#2a7a5a}
+.cta-btn.radio{background:#3a2a4a}
+.cta-btn.radio:hover{background:#6a3a8a}
+.cta-btn.code{background:#3a3a2a}
+.cta-btn.code:hover{background:#7a7a3a}
+.cta-btn.teamspeak{background:#2b6b9c}
+.cta-btn.teamspeak:hover{background:#1e4f77}
+.cta-btn.admin{background:#8e44ad}
+.cta-btn.admin:hover{background:#6c3483}
+.top-players{background:rgba(255,255,255,0.03);padding:20px;border-radius:12px;border:1px solid #2a2a55;margin:20px 0}
+.top-players h2{text-align:center;color:#f5c842}
+.player-item{display:flex;align-items:center;gap:15px;background:#14142e;padding:12px 20px;margin:10px 0;border-radius:50px;border-right:5px solid #444}
+.player-item .rank{font-weight:900;width:35px}
+.player-item .name{flex:1}
+.player-item .time{color:#4fc3f7;background:#0a0a1f;padding:4px 14px;border-radius:30px}
+.player-item.gold{border-right-color:#ffd700;background:#1e1a0a}
+.player-item.silver{border-right-color:#c0c0c0;background:#1a1a1a}
+.player-item.bronze{border-right-color:#cd7f32;background:#1a150e}
+.rank.gold{color:#ffd700}
+.rank.silver{color:#c0c0c0}
+.rank.bronze{color:#cd7f32}
+.footer{text-align:center;padding-top:20px;border-top:1px solid #2a2a50;margin-top:15px}
+.footer .datetime{font-size:1.2rem;font-weight:700;margin-top:5px;color:#f5c842}
+
+/* مودال */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999;justify-content:center;align-items:center;padding:20px}
+.modal.show{display:flex}
+.modal-box{background:#14142a;padding:25px;border-radius:20px;max-width:550px;width:100%;border:1px solid #2a2a55;max-height:90vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.modal-header h3{color:#f5c842;font-size:1.3rem}
+.modal-close{background:none;border:none;color:#999;font-size:1.5rem;cursor:pointer}
+.modal-close:hover{color:#fff}
+.form-group{margin-bottom:15px}
+.form-group label{display:block;color:#ccc;margin-bottom:5px}
+.form-group input,.form-group textarea{width:100%;padding:10px;background:#1a1a3a;border:1px solid #2a2a55;border-radius:10px;color:#fff;font-size:1rem}
+.form-group textarea{min-height:120px}
+.submit-btn{width:100%;background:#f5c842;color:#0d0d1a;border:none;padding:14px;border-radius:50px;font-size:1.1rem;font-weight:700;cursor:pointer}
+.submit-btn:hover{transform:scale(1.02)}
+.ticket-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+.ticket-grid .ticket-item{background:#161633;padding:12px;border-radius:10px;text-align:center;border:1px solid #2a2a55;cursor:pointer}
+.ticket-grid .ticket-item:hover{background:#1f1f4a;border-color:#f5c842}
+.ticket-grid .ticket-item.full{grid-column:span 2}
+.modal-content{color:#ccc;line-height:2;font-size:.9rem}
+.modal-content ul{list-style:none;padding-right:5px}
+.modal-content ul li{padding:4px 0;border-bottom:1px solid #1a1a3a}
+.modal-content .section-title{color:#f5c842;font-weight:700;font-size:1rem;margin-top:10px;display:block}
+@media(max-width:600px){.features{grid-template-columns:1fr 1fr}.ticket-grid{grid-template-columns:1fr}.ticket-grid .ticket-item.full{grid-column:span 1}.modal-box{padding:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+<div style="display:flex;justify-content:center;align-items:center;gap:15px;flex-wrap:wrap">
+<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Ccircle cx='250' cy='250' r='230' fill='%230a0a1a' stroke='%2300d4ff' stroke-width='4'/%3E%3Cpath d='M250 50 L180 90 L180 200 Q180 300 250 340 Q320 300 320 200 L320 90 Z' fill='none' stroke='%2300d4ff' stroke-width='6'/%3E%3Cpath d='M200 250 L220 250 L230 270 L270 270 L280 250 L300 250' stroke='%2300d4ff' stroke-width='5' fill='none'/%3E%3Ccircle cx='220' cy='250' r='4' fill='%2300d4ff'/%3E%3Ccircle cx='280' cy='250' r='4' fill='%2300d4ff'/%3E%3Ccircle cx='250' cy='270' r='4' fill='%2300d4ff'/%3E%3Crect x='180' y='200' width='18' height='60' fill='%2300d4ff' opacity='0.8' rx='2'/%3E%3Crect x='210' y='180' width='14' height='80' fill='%2300d4ff' opacity='0.6' rx='2'/%3E%3Crect x='240' y='190' width='20' height='70' fill='%2300d4ff' opacity='0.9' rx='2'/%3E%3Crect x='275' y='170' width='12' height='90' fill='%2300d4ff' opacity='0.7' rx='2'/%3E%3Crect x='300' y='200' width='16' height='60' fill='%2300d4ff' opacity='0.5' rx='2'/%3E%3Ctext x='250' y='420' font-family='Tahoma' font-size='32' font-weight='bold' fill='%2300d4ff' text-anchor='middle'%3ETEHRAN LIGHT%3C/text%3E%3C/svg%3E" class="logo-img">
+<h1>Tehran Light</h1>
+</div>
+<div class="tagline">⚡️تهران‌نور؛⚡️</div>
+<div style="color:#999;margin-top:5px">جایی که داستان تو آغاز می‌شود.</div>
+</div>
+
+<!-- WELCOME -->
+<div class="welcome">
+<h2>✨ خوش اومدی</h2>
+<p>به تهران لایت خوش اومدی؛ جایی که هر تصمیم، آینده‌ات را می‌سازد.</p>
+</div>
+
+<!-- SERVER INFO -->
+<div class="server-info">
+<span class="info-badge">🌐 IP: <b style="color:#4fc3f7">play.tehranlight.ir</b></span>
+<span class="info-badge">🛡️ <b>پشتیبانی ۲۴ ساعته</b></span>
+<span class="info-badge">⚡ <b>اقتصاد پویا</b></span>
+</div>
+
+<!-- ONLINE -->
+<div class="online-players">
+👥 آنلاین: <span class="number" id="playerCount">15</span> / 150
+</div>
+
+<!-- FEATURES -->
+<div class="features">
+<div class="feature-item"><span class="icon">🏙️</span> نقش‌آفرینی واقعی</div>
+<div class="feature-item"><span class="icon">💰</span> اقتصاد پویا</div>
+<div class="feature-item"><span class="icon">👨‍💻</span> تیم توسعه‌دهنده</div>
+<div class="feature-item ticket-btn" onclick="openModal('ticketModal')">
+<span class="icon">🎫</span> تیکت‌ها
+</div>
+</div>
+
+<!-- CTA BUTTONS -->
+<div class="cta-section">
+<button class="cta-btn rules" onclick="openModal('rulesModal')">📋 قوانین</button>
+<button class="cta-btn radio" onclick="openModal('radioModal')">📻 کد رادیویی</button>
+<button class="cta-btn code" onclick="openModal('statusModal')">🆘 کد وضعیت</button>
+<button class="cta-btn teamspeak" onclick="openModal('teamspeakModal')">🎙️ تیم اسپیک</button>
+<button class="cta-btn admin" onclick="window.location.href='admin.html'">🔐 پنل ادمین</button>
+</div>
+
+<!-- TOP PLAYERS -->
+<div class="top-players">
+<h2>🏆 برترین شهروندان</h2>
+<div style="text-align:center;color:#999;margin-bottom:15px">بر اساس زمان بازی (Play Time)</div>
+<div class="player-item gold"><span class="rank gold">#1</span><span>👤</span><span class="name">mobin_gg</span><span class="time">⏱️ ۱۰۰ ساعت</span></div>
+<div class="player-item silver"><span class="rank silver">#2</span><span>👤</span><span class="name">amo_mehdi</span><span class="time">⏱️ ۸۹ ساعت</span></div>
+<div class="player-item bronze"><span class="rank bronze">#3</span><span>👤</span><span class="name">ilia</span><span class="time">⏱️ ۵۰ ساعت</span></div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+<div>© 2026 Tehran Light | نور تهران</div>
+<div class="datetime" id="clockDisplay">--:--:--</div>
+</div>
+
+</div>
+
+<!-- ====== MODAL TICKET ====== -->
+<div class="modal" id="ticketModal">
+<div class="modal-box">
+<div class="modal-header">
+<h3>🎫 تیکت‌ها</h3>
+<button class="modal-close" onclick="closeModal('ticketModal')">✕</button>
+</div>
+<div class="ticket-grid">
+<div class="ticket-item" onclick="selectTicket('ارتباط با ما')">📨 ارتباط با ما</div>
+<div class="ticket-item" onclick="selectTicket('مشکل شهری')">🏙️ مشکل شهری</div>
+<div class="ticket-item" onclick="selectTicket('خرید')">💳 خرید</div>
+<div class="ticket-item" onclick="selectTicket('درخواست آنبن کردن')">🔓 درخواست آنبن</div>
+<div class="ticket-item full" onclick="selectTicket('پیشنهاد برای بهبود سرور')">💡 پیشنهاد بهبود</div>
+</div>
+<form onsubmit="submitTicket(event)">
+<div class="form-group">
+<label>عنوان</label>
+<input id="ticketTitle" readonly>
+</div>
+<div class="form-group">
+<label>توضیحات</label>
+<textarea id="ticketDesc" placeholder="مشکل خود را کامل توضیح دهید..." required></textarea>
+</div>
+<div class="form-group">
+<label>نام کاربری (اختیاری)</label>
+<input id="ticketUser" placeholder="نام کاربری خود را وارد کنید...">
+</div>
+<button type="submit" class="submit-btn">📤 ارسال تیکت</button>
+</form>
+</div>
+</div>
+
+<!-- ====== MODAL RULES ====== -->
+<div class="modal" id="rulesModal">
+<div class="modal-box">
+<div class="modal-header">
+<h3>📋 قوانین سرور</h3>
+<button class="modal-close" onclick="closeModal('rulesModal')">✕</button>
+</div>
+<div class="modal-content">
+<span class="section-title">🎭 RP (Roleplay)</span>
+<p style="padding-right:10px;margin-bottom:5px">ایفای نقش و زندگی کردن در قالب شخصیت بازی.</p>
+<span class="section-title">❌ Non-RP</span>
+<p style="padding-right:10px;margin-bottom:5px">انجام کارهای غیرمنطقی و دور از واقعیت.</p>
+<span class="section-title">⚠️ Power Gaming (PG)</span>
+<p style="padding-right:10px;margin-bottom:5px">انجام کارهایی که در دنیای واقعی ممکن نیست یا تحمیل نقش به دیگران.</p>
+<span class="section-title">🧠 Meta Gaming</span>
+<p style="padding-right:10px;margin-bottom:5px">استفاده از اطلاعات خارج از بازی (OOC) در داخل بازی (IC).</p>
+<span class="section-title">😨 Fear RP</span>
+<p style="padding-right:10px;margin-bottom:5px">ارزش قائل شدن برای جان شخصیت خود.</p>
+<span class="section-title">🔫 KOS (Kill On Sight)</span>
+<p style="padding-right:10px;margin-bottom:5px">داشتن دلیل و مدرک کافی برای درگیری یا تیراندازی.</p>
+<span class="section-title">❌ DM (Death Match)</span>
+<p style="padding-right:10px;margin-bottom:5px">کشتن یا آسیب زدن به افراد بدون دلیل RP.</p>
+<span class="section-title">🚗 VDM (Vehicle Death Match)</span>
+<p style="padding-right:10px;margin-bottom:5px">آسیب زدن یا کشتن افراد با خودرو به‌صورت عمدی و غیرمنطقی.</p>
+<span class="section-title">🏔️ GTA Driving</span>
+<p style="padding-right:10px;margin-bottom:5px">رانندگی غیرواقعی و غیرمنطقی.</p>
+<span class="section-title">🆕 New Life Rule (NLR)</span>
+<p style="padding-right:10px;margin-bottom:5px">پس از مرگ، چیزی از اتفاقات قبل یادتان نمی‌آید و تا ۳۰ دقیقه نباید به محل مرگ بازگردید.</p>
+<span class="section-title">🛡️ NCZ (No Crime Zone)</span>
+<p style="padding-right:10px;margin-bottom:5px">منطقه امن که در آن جرم و درگیری ممنوع است.</p>
+<span class="section-title">☮️ Safe Zone</span>
+<p style="padding-right:10px;margin-bottom:5px">منطقه‌ای که تیراندازی و درگیری در آن ممنوع است.</p>
+<span class="section-title">💬 IC (In Character)</span>
+<p style="padding-right:10px;margin-bottom:5px">اطلاعات و اتفاقات داخل بازی.</p>
+<span class="section-title">🌍 OOC (Out Of Character)</span>
+<p style="padding-right:10px;margin-bottom:5px">اطلاعات خارج از بازی و دنیای واقعی.</p>
+<span class="section-title">🚓 Cop Baiting</span>
+<p style="padding-right:10px;margin-bottom:5px">تحریک یا اذیت عمدی پلیس برای جلب توجه.</p>
+<span class="section-title">😡 OOC Insult</span>
+<p style="padding-right:10px;margin-bottom:5px">توهین خارج از نقش و قوانین RP.</p>
+<span class="section-title">🤡 RP Trolling</span>
+<p style="padding-right:10px;margin-bottom:5px">مسخره کردن یا آزار دیگران به‌قصد خراب کردن RP.</p>
+<span class="section-title">🚫 Kill Without KOS</span>
+<p style="padding-right:10px;margin-bottom:5px">کشتن فرد بدون داشتن دلیل RP یا KOS.</p>
+<span class="section-title">📢 Crossment</span>
+<p style="padding-right:10px;margin-bottom:5px">ایجاد مزاحمت برای شهروندان یا برهم زدن نظم شهر.</p>
+<span class="section-title">🤝 MZ (مذاکره)</span>
+<p style="padding-right:10px;margin-bottom:5px">شرایط و مراحل مذاکره میان طرفین در RP.</p>
+</div>
+</div>
+</div>
+
+<!-- ====== MODAL RADIO ====== -->
+<div class="modal" id="radioModal">
+<div class="modal-box">
+<div class="modal-header">
+<h3>📻 کدهای رادیویی</h3>
+<button class="modal-close" onclick="closeModal('radioModal')">✕</button>
+</div>
+<div class="modal-content">
+<ul>
+<li>🔹 10-1 : همه نیروها به محل مشخص اعزام شوند</li>
+<li>🔹 10-2 : سکوت در محل</li>
+<li>🔹 10-3 : رادیو را خلوت کنید</li>
+<li>🔹 10-4 : دریافت شد / اوکی</li>
+<li>🔹 10-5 : تکرار آخرین پیام رادیویی</li>
+<li>🔹 10-6 : دریافت نکردن آخرین پیام</li>
+<li>🔹 10-7 : اجازه آفلاین (AFK)</li>
+<li>🔹 10-8 : آماده پاسخگویی</li>
+<li>🔹 10-9 : مشغول در یک موقعیت</li>
+<li>🔹 10-14 : تشکر</li>
+<li>🔹 10-15 : مجرم</li>
+<li>🔹 10-16 : مثبت (+)</li>
+<li>🔹 10-17 : منفی (-)</li>
+<li>🔹 10-20 : اعلام موقعیت</li>
+<li>🔹 10-21 : اعلام موقعیت و شرایط</li>
+<li>🔹 10-37 : کال‌ساین یا اعلام هویت</li>
+<li>🔹 10-41 : ورود به شیفت (ON Duty)</li>
+<li>🔹 10-42 : خروج از شیفت (OFF Duty)</li>
+<li>🔹 10-43 : درخواست اجازه ورود به محل</li>
+<li>🔹 10-44 : درخواست اجازه خروج از محل</li>
+<li>🔹 10-45 : تغییر فرکانس رادیو</li>
+<li>🔹 10-60 : درخواست نیروی X-Ray</li>
+<li>🔹 10-63 : اجازه بلند شدن X-Ray</li>
+<li>🔹 10-64 : اجازه فرود X-Ray</li>
+<li>🔹 10-70 : درخواست نیروی کمکی</li>
+<li>🔹 10-88 : رادیوی مشترک</li>
+<li>🔹 10-97 : اعزام به موقعیت</li>
+<li>🔹 10-99 : موقعیت با موفقیت به پایان رسید</li>
+<li>🚁 101 : اجازه ورود هوانیروز و ارتش به شهر (با اطلاع قبلی)</li>
+<li>🚛 107 : اعلام نام و نوع وسیله‌ای که قرار است وارد شهر شود</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- ====== MODAL STATUS ====== -->
+<div class="modal" id="statusModal">
+<div class="modal-box">
+<div class="modal-header">
+<h3>🎮 کدهای وضعیت (CODE)</h3>
+<button class="modal-close" onclick="closeModal('statusModal')">✕</button>
+</div>
+<div class="modal-content">
+<ul>
+<li>🟢 CODE -1 : بازیکن جدید</li>
+<li>🔴 CODE 0 : قطع ارتباط / کرش بازی</li>
+<li>🟡 CODE 1 : درخواست نیروی کمکی از سایر ارگان‌ها</li>
+<li>🔵 CODE 2 : چراغ اضطراری بدون آژیر</li>
+<li>🚨 CODE 3 : چراغ اضطراری همراه آژیر</li>
+<li>⚪ CODE 4 : نیروی کمکی نیاز نیست</li>
+<li>🚔 CODE 6 : یک واحد گشتی</li>
+<li>📍 CODE 9 : مشغول در یک موقعیت</li>
+</ul>
+</div>
+</div>
+</div>
+
+<!-- ====== MODAL TEAMSPEAK ====== -->
+<div class="modal" id="teamspeakModal">
+<div class="modal-box">
+<div class="modal-header">
+<h3>🎙️ تیم اسپیک</h3>
+<button class="modal-close" onclick="closeModal('teamspeakModal')">✕</button>
+</div>
+<div style="text-align:center;padding:20px 0">
+<p style="font-size:1.1rem;color:#ccc">آدرس تیم اسپیک سرور:</p>
+<p style="font-size:2rem;font-weight:900;color:#4fc3f7;background:#1a1a3a;padding:15px;border-radius:12px;border:2px dashed #2a2a55;direction:ltr;letter-spacing:3px">IP Server: ———</p>
+<p style="margin-top:15px;color:#999">به زودی...</p>
+</div>
+</div>
+</div>
+
+<script>
+// ====== ساعت ======
+function updateClock(){
+    const n=new Date();
+    document.getElementById('clockDisplay').textContent=
+        String(n.getHours()).padStart(2,'0')+':'+
+        String(n.getMinutes()).padStart(2,'0')+':'+
+        String(n.getSeconds()).padStart(2,'0');
+}
+updateClock();
+setInterval(updateClock,1000);
+
+// ====== تعداد بازیکنان ======
+setInterval(()=>{
+    document.getElementById('playerCount').textContent=Math.floor(Math.random()*30)+10;
+},5000);
+
+// ====== باز کردن مودال ======
+function openModal(id){
+    document.getElementById(id).classList.add('show');
+}
+
+// ====== بستن مودال ======
+function closeModal(id){
+    document.getElementById(id).classList.remove('show');
+}
+
+// ====== تیکت ======
+let tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+
+function selectTicket(cat){
+    document.getElementById('ticketTitle').value=cat;
+    document.getElementById('ticketDesc').focus();
+}
+
+function submitTicket(e){
+    e.preventDefault();
+    
+    const title = document.getElementById('ticketTitle').value;
+    const desc = document.getElementById('ticketDesc').value;
+    const user = document.getElementById('ticketUser').value || 'ناشناس';
+    const time = new Date().toLocaleString('fa-IR');
+    
+    const ticketData = {
+        id: Date.now(),
+        title: title,
+        desc: desc,
+        user: user,
+        time: time,
+        status: 'جدید',
+        answer: ''
+    };
+    
+    // ذخیره در localStorage
+    tickets.push(ticketData);
+    localStorage.setItem('tickets', JSON.stringify(tickets));
+    
+    // ارسال به تلگرام
+    sendToTelegram(ticketData);
+    
+    alert('✅ تیکت شما با موفقیت ارسال شد!');
+    closeModal('ticketModal');
+    e.target.reset();
+}
+
+// ====== ارسال به تلگرام ======
+function sendToTelegram(ticket){
+    const BOT_TOKEN = '8975761376:AAG77syzpv7_n7FLQSwuv8go5FDO81N1CRA';
+    const CHAT_ID = '8494766519';
+    
+    const message = `📩 **تیکت جدید**\n` +
+                    `🆔 شناسه: ${ticket.id}\n` +
+                    `👤 کاربر: ${ticket.user}\n` +
+                    `📌 عنوان: ${ticket.title}\n` +
+                    `📝 توضیحات: ${ticket.desc}\n` +
+                    `🕐 زمان: ${ticket.time}\n` +
+                    `📊 وضعیت: ${ticket.status}`;
+    
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: message,
+            parse_mode: 'Markdown'
+        })
+    }).then(res => res.json())
+      .then(data => {
+          if(data.ok){
+              console.log('✅ پیام به تلگرام ارسال شد!');
+          } else {
+              console.log('❌ خطا در ارسال به تلگرام:', data);
+          }
+      })
+      .catch(err => console.log('❌ خطا:', err));
+}
+
+// ====== بستن با کلیک خارج ======
+document.querySelectorAll('.modal').forEach(m=>{
+    m.addEventListener('click',function(e){
+        if(e.target===this) this.classList.remove('show');
+    });
+});
+
+// ====== بستن با ESC ======
+document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+        document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'));
+    }
+});
+</script>
+
+</body>
+</html>

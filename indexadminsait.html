@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل ادمین - Tehran Light</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d0d1a;color:#e0e0e0;font-family:Tahoma;padding:20px}
+.container{max-width:1000px;margin:0 auto}
+.header{text-align:center;padding:20px;border-bottom:2px solid #2a2a50;margin-bottom:30px}
+.header h1{color:#f5c842;font-size:2rem}
+.header .sub{color:#999}
+.ticket-list{display:flex;flex-direction:column;gap:15px}
+.ticket-card{background:linear-gradient(145deg,#14142a,#1a1a35);padding:20px;border-radius:16px;border:1px solid #2a2a55;transition:0.3s}
+.ticket-card:hover{border-color:#f5c842}
+.ticket-card .header{display:flex;justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid #2a2a50;margin-bottom:10px;flex-wrap:wrap}
+.ticket-card .id{color:#4fc3f7;font-weight:700}
+.ticket-card .status{padding:4px 14px;border-radius:30px;font-size:.85rem;font-weight:700}
+.status-new{background:#e74c3c;color:#fff}
+.status-answered{background:#2ecc71;color:#fff}
+.status-pending{background:#f39c12;color:#fff}
+.ticket-card .title{font-size:1.1rem;color:#f5c842;font-weight:700}
+.ticket-card .desc{color:#ccc;margin:10px 0;line-height:1.8}
+.ticket-card .meta{color:#999;font-size:.85rem;display:flex;gap:15px;flex-wrap:wrap}
+.ticket-card .answer-section{margin-top:15px;padding-top:15px;border-top:1px solid #2a2a50}
+.ticket-card .answer-section textarea{width:100%;padding:10px;background:#1a1a3a;border:1px solid #2a2a55;border-radius:10px;color:#fff;font-size:1rem;min-height:80px;resize:vertical;font-family:Tahoma}
+.ticket-card .answer-section .btn-answer{background:#f5c842;color:#0d0d1a;border:none;padding:10px 30px;border-radius:50px;font-weight:700;cursor:pointer;margin-top:10px}
+.ticket-card .answer-section .btn-answer:hover{transform:scale(1.05)}
+.ticket-card .answer-section .answer-text{background:#1a1a3a;padding:12px;border-radius:10px;border-right:3px solid #2ecc71;margin-top:10px;color:#ccc}
+.empty-msg{text-align:center;padding:50px;color:#666;font-size:1.2rem}
+.back-btn{display:inline-block;background:#2a2a55;color:#fff;padding:10px 25px;border-radius:50px;text-decoration:none;margin-bottom:20px;transition:0.3s}
+.back-btn:hover{background:#f5c842;color:#0d0d1a}
+@media(max-width:600px){.ticket-card .header{flex-direction:column;gap:10px;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="container">
+    <a href="index.html" class="back-btn">← بازگشت به سایت</a>
+    
+    <div class="header">
+        <h1>🔐 پنل مدیریت تیکت‌ها</h1>
+        <div class="sub">مدیریت و پاسخ به تیکت‌های کاربران</div>
+    </div>
+
+    <div id="ticketList" class="ticket-list">
+        <!-- تیکت‌ها توسط جاوااسکریپت بارگذاری میشن -->
+    </div>
+</div>
+
+<script>
+// ====== بارگذاری تیکت‌ها ======
+function loadTickets(){
+    const tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+    const container = document.getElementById('ticketList');
+    
+    if(tickets.length === 0){
+        container.innerHTML = '<div class="empty-msg">📭 هیچ تیکتی وجود ندارد</div>';
+        return;
+    }
+    
+    let html = '';
+    tickets.reverse().forEach((ticket, index) => {
+        const realIndex = tickets.length - 1 - index;
+        let statusClass = 'status-new';
+        let statusText = 'جدید';
+        if(ticket.status === 'پاسخ داده شد'){
+            statusClass = 'status-answered';
+            statusText = '✅ پاسخ داده شد';
+        } else if(ticket.status === 'در حال بررسی'){
+            statusClass = 'status-pending';
+            statusText = '⏳ در حال بررسی';
+        }
+        
+        html += `
+            <div class="ticket-card" id="ticket-${ticket.id}">
+                <div class="header">
+                    <div>
+                        <span class="id">#${ticket.id}</span>
+                        <span class="title">${ticket.title}</span>
+                    </div>
+                    <span class="status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="meta">
+                    <span>👤 ${ticket.user}</span>
+                    <span>🕐 ${ticket.time}</span>
+                </div>
+                <div class="desc">${ticket.desc}</div>
+                
+                ${ticket.answer ? `
+                    <div class="answer-section">
+                        <div class="answer-text">
+                            <strong style="color:#2ecc71">💬 پاسخ ادمین:</strong><br>
+                            ${ticket.answer}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div class="answer-section">
+                    <textarea id="answer-${ticket.id}" placeholder="پاسخ خود را وارد کنید..."></textarea>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <button class="btn-answer" onclick="answerTicket(${ticket.id}, 'پاسخ داده شد')">📤 ارسال پاسخ</button>
+                        <button class="btn-answer" onclick="answerTicket(${ticket.id}, 'در حال بررسی')" style="background:#f39c12;color:#fff">⏳ در حال بررسی</button>
+                        <button class="btn-answer" onclick="deleteTicket(${ticket.id})" style="background:#e74c3c;color:#fff">🗑️ حذف</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+// ====== پاسخ به تیکت ======
+function answerTicket(id, status){
+    const answerText = document.getElementById(`answer-${id}`).value;
+    if(!answerText && status !== 'در حال بررسی'){
+        alert('لطفاً پاسخ خود را وارد کنید!');
+        return;
+    }
+    
+    let tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+    const index = tickets.findIndex(t => t.id === id);
+    
+    if(index !== -1){
+        if(status === 'پاسخ داده شد' && answerText){
+            tickets[index].answer = answerText;
+            tickets[index].status = status;
+        } else {
+            tickets[index].status = status;
+        }
+        localStorage.setItem('tickets', JSON.stringify(tickets));
+        loadTickets();
+        alert('✅ تیکت با موفقیت به‌روزرسانی شد!');
+    }
+}
+
+// ====== حذف تیکت ======
+function deleteTicket(id){
+    if(!confirm('آیا مطمئن هستید که می‌خواهید این تیکت را حذف کنید؟')){
+        return;
+    }
+    
+    let tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+    tickets = tickets.filter(t => t.id !== id);
+    localStorage.setItem('tickets', JSON.stringify(tickets));
+    loadTickets();
+    alert('🗑️ تیکت حذف شد!');
+}
+
+// ====== بارگذاری اولیه ======
+loadTickets();
+
+// ====== آپدیت خودکار هر 5 ثانیه ======
+setInterval(loadTickets, 5000);
+</script>
+</body>
+</html>
